@@ -1,0 +1,9 @@
+---
+- name: passenger rehash rbenv
+  # Using custom task here because rbenv dir would be excluded from sudo's
+  # secure path
+  command: bash -lc "rbenv rehash"
+  when: '"zzet.rbenv" in role_names'
+
+- name: reload systemd
+  command: systemctl daemon-reload

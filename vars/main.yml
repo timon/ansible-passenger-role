@@ -1,0 +1,5 @@
+
+passenger_gems:
+  - { gem: "rack", version: "{{ passenger_gem_versions_rack }}" }
+  - { gem: "rake", version: "{{ passenger_gem_versions_rake }}" }
+  - { gem: "passenger", version: "{{ passenger_version }}" }
