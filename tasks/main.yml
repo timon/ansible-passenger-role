@@ -59,7 +59,7 @@
 
 - name: Stub passenger module config
   copy:
-    content: " {{ passenger_module_snippet.stdout }}\n"
+    content: "{{ passenger_module_snippet.stdout }}\n"
     dest: "{{ passenger_module_config_path }}"
   notify: restart apache
   when: not passenger_module_loaded or passenger_module_loaded is failed
