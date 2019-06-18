@@ -92,15 +92,22 @@
   command: a2enmod passenger
   when: ansible_os_family == "Debian"
 
-- include: systemd_tweaks.yml
-  notify:
-    - "reload systemd"
+- name: Configure systemd to autocreate instance registry dir
+  block:
+  - include: systemd_tweaks.yml
+    notify:
+      - "reload systemd"
+  when: ansible_service_mgr == "systemd"
 
-  # Force flush_handlers so that next apache restart will take place after
-  # systemd reload
+# Force flush_handlers so that next apache restart takes place
+# after systemd reload.
+#
+# Unfortunately, it can not be invoked from the block above,
+# because the block is guarded by `when' condition and `meta' module
+# does not support it.
 - meta: flush_handlers
 
-- name: Configure passenger instance registry dir
+- name: Configure passenger to use instance registry dir
   lineinfile:
     dest: "{{ passenger_mod_conf_path }}"
     line: "  PassengerInstanceRegistryDir {{ passenger_registry_dir }}"

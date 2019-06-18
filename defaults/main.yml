@@ -4,6 +4,9 @@
 # Top apache config directory
 apache_conf_dir: "/etc/{{ apache_service }}"
 
+# Where to put systemd overrides
+apache_service_d: "/etc/systemd/system/{{ apache_service }}.service.d"
+
 # How to invoke `gem` command?
 passenger_gem_command: /usr/bin/gem
 
