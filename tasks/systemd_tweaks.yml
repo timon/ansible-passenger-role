@@ -2,12 +2,12 @@
 
 - name: Make httpd.service.d directory for systemd
   file:
-    path: /etc/systemd/system/httpd.service.d
+    path: "{{ apache_service_d }}"
     state: directory
 
 - name: Setup passenger instance registry dir creation on httpd startup
   template:
     src: passenger-instreg-dir.conf.j2
-    dest: /etc/systemd/system/httpd.service.d/passenger-instreg-dir.conf
+    dest: "{{ apache_service_d }}/passenger-instreg-dir.conf"
 
 

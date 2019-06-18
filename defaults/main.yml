@@ -1,12 +1,29 @@
+# See vars/*.yml for distro-specific configuration of apache service name,
+# build dependencies and config files locations
+
+# Top apache config directory
+apache_conf_dir: "/etc/{{ apache_service }}"
+
+# Where to put systemd overrides
+apache_service_d: "/etc/systemd/system/{{ apache_service }}.service.d"
+
 # How to invoke `gem` command?
 passenger_gem_command: /usr/bin/gem
+
+# Gem version specifications.
 passenger_gem_versions_rack: "~> 1.0"
 passenger_gem_versions_rake: "~> 10.0"
+# Passenger version is controlled by passenger_version variable below, this
+# just provides default of "any version will do".
 passenger_gem_versions_passenger: "> 0"
 
+# Which languages should be supported by mod_passenger build
 passenger_languages: ruby
 
-passenger_module_config_path: /etc/httpd/conf.modules.d/00-passenger.conf
+# This directory is used for passenger-stats, passenger-memory-stats et al.
+# The default value from passenger uses directory within /tmp which becomes
+# inaccessible in CentOS flying with PrivateTmp flag by default
 passenger_registry_dir: /var/run/passenger-instreg
 
+# Passenger gem version to install
 passenger_version: "{{ passenger_gem_versions_passenger }}"

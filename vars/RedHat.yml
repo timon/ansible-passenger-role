@@ -1,0 +1,14 @@
+# Name of apache service (for systemd tweaks and etc path)
+apache_service: httpd
+
+# Package names to install when running yum-based release
+# (known to work with CentOS 7.5)
+passenger_build_deps:
+  - "gcc-c++"
+  - "libcurl-devel"
+
+# CentOS uses one folder for modules configuration and groups everything
+# related to a single module into one file
+passenger_mod_configs_dir: "{{ apache_conf_dir }}/conf.modules.d"
+passenger_mod_conf_path: "{{ passenger_mod_configs_dir }}/mod_passenger.conf"
+passenger_mod_load_path: "{{ passenger_mod_conf_path }}"
