@@ -1,6 +1,9 @@
 # See vars/*.yml for distro-specific configuration of apache service name,
 # build dependencies and config files locations
 
+# Top apache config directory
+apache_conf_dir: "/etc/{{ apache_service }}"
+
 # How to invoke `gem` command?
 passenger_gem_command: /usr/bin/gem
 
@@ -13,8 +16,6 @@ passenger_gem_versions_passenger: "> 0"
 
 # Which languages should be supported by mod_passenger build
 passenger_languages: ruby
-
-passenger_module_config_path: /etc/httpd/conf.modules.d/00-passenger.conf
 
 # This directory is used for passenger-stats, passenger-memory-stats et al.
 # The default value from passenger uses directory within /tmp which becomes

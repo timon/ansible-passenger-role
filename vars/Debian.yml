@@ -1,3 +1,6 @@
+# Name of apache service (for systemd tweaks and etc path)
+apache_service: apache2
+
 # Package names to install when running deb-based release
 # (known to work with Debian stretch)
 passenger_build_deps:
@@ -6,3 +9,11 @@ passenger_build_deps:
   - "apache2-dev"
   - "libapr1-dev"
   - "libaprutil1-dev"
+
+# Debian systems have folder for module configuration templates
+# (mods-available) and uses symlink into the other folder (mods-enabled) to
+# actually load module's configuration.
+# Also, Debian systems have separate files for module loading vs. configuration
+passenger_mod_configs_dir: "{{ apache_conf_dir }}/mods-available"
+passenger_mod_conf_path: "{{ passenger_mod_configs_dir }}/passenger.conf"
+passenger_mod_load_path: "{{ passenger_mod_configs_dir }}/passenger.load"

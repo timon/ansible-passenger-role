@@ -67,21 +67,30 @@
             'passenger-install-apache2-module --snippet'"
   register: passenger_module_snippet
 
-- name: Check passenger module configured is up to date
-  lineinfile:
-    dest: "{{ passenger_module_config_path }}"
-    line: "LoadModule {{ passenger_apache_module_path }}"
-    regexp: "{{ passenger_apache_module_path }}"
-  check_mode: true
-  ignore_errors: true
-  register: passenger_module_loaded
-
-- name: Stub passenger module config
+- name: Write passenger config file
   copy:
     content: "{{ passenger_module_snippet.stdout }}\n"
-    dest: "{{ passenger_module_config_path }}"
+    dest: "{{ passenger_mod_conf_path }}"
   notify: restart apache
-  when: not passenger_module_loaded or passenger_module_loaded is failed
+  when: passenger_mod_conf_path == passenger_mod_load_path
+
+- name: Write passenger config files
+  block:
+    - name: Write mod_passenger.load
+      copy:
+        content: "{{ passenger_module_snippet.stdout_lines[0] }}\n"
+        dest: "{{ passenger_mod_load_path }}"
+    - name: Write mod_passenger.conf
+      copy:
+        content:
+          "{{ passenger_module_snippet.stdout_lines[1:] | join('\n') }}\n"
+        dest: "{{ passenger_mod_conf_path }}"
+      notify: restart apache
+  when: passenger_mod_conf_path != passenger_mod_load_path
+
+- name: Run a2enmod for Debian
+  command: a2enmod passenger
+  when: ansible_os_family == "Debian"
 
 - include: systemd_tweaks.yml
   notify:
@@ -93,7 +102,7 @@
 
 - name: Configure passenger instance registry dir
   lineinfile:
-    dest: "{{ passenger_module_config_path }}"
+    dest: "{{ passenger_mod_conf_path }}"
     line: "  PassengerInstanceRegistryDir {{ passenger_registry_dir }}"
     insertbefore: "</IfModule>"
   notify: "restart apache"
