@@ -1,0 +1,8 @@
+# Package names to install when running deb-based release
+# (known to work with Debian stretch)
+passenger_build_deps:
+  - "g++"
+  - "libcurl4-openssl-dev"
+  - "apache2-dev"
+  - "libapr1-dev"
+  - "libaprutil1-dev"

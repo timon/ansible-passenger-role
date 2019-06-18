@@ -1,3 +1,6 @@
+# See vars/*.yml for distro-specific configuration of apache service name,
+# build dependencies and config files locations
+
 # How to invoke `gem` command?
 passenger_gem_command: /usr/bin/gem
 

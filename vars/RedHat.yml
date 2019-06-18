@@ -1,0 +1,5 @@
+# Package names to install when running yum-based release
+# (known to work with CentOS 7.5)
+passenger_build_deps:
+  - "gcc-c++"
+  - "libcurl-devel"
