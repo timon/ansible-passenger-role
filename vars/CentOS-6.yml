@@ -1,0 +1,2 @@
+passenger_mod_configs_dir: "{{ apache_conf_dir }}/conf.d"
+

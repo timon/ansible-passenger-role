@@ -6,6 +6,8 @@ apache_service: httpd
 passenger_build_deps:
   - "gcc-c++"
   - "libcurl-devel"
+  - "openssl-devel"
+  - "zlib-devel"
 
 # CentOS uses one folder for modules configuration and groups everything
 # related to a single module into one file

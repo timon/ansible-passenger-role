@@ -1,5 +1,5 @@
 ---
-- name: Define OS-specific vars
+- name: Define distribution-specific vars
   include_vars: "{{ item }}"
   with_first_found:
     - files:
@@ -10,12 +10,30 @@
       skip: true
   when: passenger_build_deps is not defined
 
+  # Allow major-speific overrides, e.g. for CentOS 6
+  # These should be loaded after more generic vars
+- name: Define release-specific vars
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+      - "../vars/{{ ansible_distribution }}-{{ansible_distribution_major_version}}.yml"
+      # Ansible warns about skip: true deprecation,
+      # but errors: ignore seems to need polishing as of 18.06.2019:
+      # https://github.com/ansible/ansible/issues/56775
+      skip: true
+
+- name: Detect if can use phusion's RPMs
+  set_fact:
+    use_phusion_rpms: "{{ ((ansible_distribution == 'CentOS') and \
+                       ((ansible_distribution_major_version | int) >= 7)) | \
+                       bool }}"
+  when: use_phusion_rpms is not defined
 
 - name: Install passenger on centos via Phusion RPMs
   include_tasks: phusion_centos_distribution.yml
-  when: ansible_distribution == 'CentOS'
+  when: use_phusion_rpms
 
 - name: Build and install passenger from scratch
   include_tasks: install_from_scratch.yml
-  when: ansible_distribution != 'CentOS'
+  when: not use_phusion_rpms
 

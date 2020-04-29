@@ -3,6 +3,8 @@ Changelog for mod_passenger role
 
 ## master
 
+* Add support for CentOS 6
+
 ## v2.0.0 (2020-04-29 15:46 MSK)
 
 * Use RPMs provided by Phusion For CentOS hosts
