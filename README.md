@@ -5,11 +5,18 @@ This role configures usage of Phusion Passenger.
 
 It requires `geerlingguy.apache` role to execute.
 
+For CentOS systems this role will install RPMs provided by Phusion, using the
+steps outlined on [Passenger Site](https://www.phusionpassenger.com/library/install/apache/install/oss/el7/).
+
 When `zzet.rbenv` role is detected, `rbenv rehash` command would be issued
 after gem installation (assuming system-wide rbenv install).
 
 Role Variables
 --------------
+
+These variables are used when Passenger is built from scratch. When using RPMs
+provided by Phusion, configuration module paths are adjusted to match the
+layout of the RPM.
 
 Variable                        | Description
 --------------------------------|-------------
@@ -23,7 +30,7 @@ passenger\_languages            | Languages to enable, e.g `ruby,nodejs` (`ruby`
 passenger\_mod\_configs\_dir    | The directory with apache's modules' configuration
 passenger\_mod\_conf\_path      | Path to module configuration snippet
 passenger\_mod\_load\_path      | Path to module load snippet (could be the same as `passenger_mod_conf_path`)
-passenger\_registry\_dir        | Path to passenger instance regsitry (`/var/run/passenger-instreg`)
+passenger\_registry\_dir        | Path to passenger instance registry (`/var/run/passenger-instreg`)
 
 Since CentOS 7+ uses feature known as 'PrivateTmp', default passenger
 installation won't be able to query passenger router about its status.
@@ -37,18 +44,19 @@ OS Support
 
 The mod\_passenger role supports Debian 9 and CentOS 7.
 
-CentOS uses `/etc/httpd/conf.modules.d` folder for modules configuration
-and groups everything related to a single module into one file.
-
 Debian systems have `/etc/apache2/mods-available` which holds all modules'
 configuration files and `/etc/apache2/mods-enabled` for actually enabled
 modules. Additionally, module loading is separated from module configuration.
+
+CentOS uses `/etc/httpd/conf.modules.d` folder for modules configuration
+and groups everything related to a single module into one file, however,
+packages provided by Phusion still have separate files for including the
+module and configuring it.
 
 This role follows the rule `when in Rome, do as the Romans do`,
 and supports both styles, checking if the `passenger_mod_conf_path` variable
 has the same value as the `passenger_mod_load_path` to determine
 which style to use.
-
 
 Example Playbook
 ----------------
