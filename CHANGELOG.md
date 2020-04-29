@@ -3,6 +3,8 @@ Changelog for mod_passenger role
 
 ## master
 
+## v2.1.0 (2020-04-30 00:49 MSK)
+
 * Add support for CentOS 6
 
 ## v2.0.0 (2020-04-29 15:46 MSK)
