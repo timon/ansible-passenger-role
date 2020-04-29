@@ -1,0 +1,24 @@
+# https://www.phusionpassenger.com/library/install/apache/install/oss/el7/#enable_epel
+- name: Load configuration tweaks for Phusion Passenger
+  include_vars: "../vars/phusion_centos_distribution.yml"
+- name: Install prerequisite packages
+  yum:
+    name:
+      - curl
+      - epel-release
+      - pygpgme
+      - yum-utils
+- name: Enable EPEL and Contiunous Release
+  command: yum-config-manager --enable epel,cr
+- name: Update installed packages
+  yum:
+    name: "*"
+    state: latest
+- name: Configure Passenger repository
+  get_url:
+    url: "https://oss-binaries.phusionpassenger.com/\
+          yum/definitions/el-passenger.repo"
+    dest: /etc/yum.repos.d/passenger.repo
+- name: Install passenger
+  yum:
+    name: mod_passenger
