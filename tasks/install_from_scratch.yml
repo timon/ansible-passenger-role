@@ -1,0 +1,102 @@
+- name: Check if build dependenices are defined
+  fail:
+    msg: >
+      Please define passenger_build_deps for your distribution.
+
+      PRs are welcome at
+      https://github.com/timon/ansible-passenger-role/pull/new
+  when: passenger_build_deps is not defined
+
+- name: Install passenger build dependencies
+  package:
+    name: "{{ passenger_build_deps }}"
+
+- name: Install passenger gems
+  gem:
+    name: "{{ item.gem }}"
+    version: "{{ item.version }}"
+    executable: "{{ passenger_gem_command }}"
+    user_install: false
+  loop: "{{ passenger_gems }}"
+  notify: passenger rehash rbenv
+
+- name: Get base gem path
+  command: "{{ passenger_gem_command }} environment gemdir"
+  register: passenger_gem_dir
+  changed_when: false
+
+- name: Get passenger version installed
+  shell: |
+    {{ passenger_gem_command }} list \
+      -q passenger -v "{{ passenger_version }}" | \
+    sed -E 's/.*\(([^,)]*).*$/\1/'
+  register: passenger_version_installed
+
+- name: Set passenger module paths
+  set_fact:
+    passenger_apache_module_path: "{{ passenger_gem_dir.stdout }}/gems/\
+                                   passenger-\
+                                   {{ passenger_version_installed.stdout }}/\
+                                   buildout/apache2/mod_passenger.so"
+
+- name: Finalize passenger gem installation
+  meta: flush_handlers
+
+- name: Build passenger apache module
+  command: "/bin/bash -lc \
+            'passenger-install-apache2-module --auto \
+            --languages={{ passenger_languages }}'"
+  args:
+    creates: "{{ passenger_apache_module_path }}"
+
+- name: Set passenger configuration template
+  command: "/bin/bash -lc \
+            'passenger-install-apache2-module --snippet'"
+  register: passenger_module_snippet
+
+- name: Write passenger config file
+  copy:
+    content: "{{ passenger_module_snippet.stdout }}\n"
+    dest: "{{ passenger_mod_conf_path }}"
+  notify: restart apache
+  when: passenger_mod_conf_path == passenger_mod_load_path
+
+- name: Write passenger config files
+  block:
+    - name: Write mod_passenger.load
+      copy:
+        content: "{{ passenger_module_snippet.stdout_lines[0] }}\n"
+        dest: "{{ passenger_mod_load_path }}"
+    - name: Write mod_passenger.conf
+      copy:
+        content:
+          "{{ passenger_module_snippet.stdout_lines[1:] | join('\n') }}\n"
+        dest: "{{ passenger_mod_conf_path }}"
+      notify: restart apache
+  when: passenger_mod_conf_path != passenger_mod_load_path
+
+- name: Run a2enmod for Debian
+  command: a2enmod passenger
+  when: ansible_os_family == "Debian"
+
+- name: Configure systemd to autocreate instance registry dir
+  block:
+  - include: systemd_tweaks.yml
+    notify:
+      - "reload systemd"
+  when: ansible_service_mgr == "systemd"
+
+# Force flush_handlers so that next apache restart takes place
+# after systemd reload.
+#
+# Unfortunately, it can not be invoked from the block above,
+# because the block is guarded by `when' condition and `meta' module
+# does not support it.
+- meta: flush_handlers
+
+- name: Configure passenger to use instance registry dir
+  lineinfile:
+    dest: "{{ passenger_mod_conf_path }}"
+    line: "  PassengerInstanceRegistryDir {{ passenger_registry_dir }}"
+    insertbefore: "</IfModule>"
+  notify: "restart apache"

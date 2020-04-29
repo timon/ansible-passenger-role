@@ -1,0 +1,4 @@
+# These variables reflect how passenger RPMs are laid out
+passenger_mod_configs_dir: "{{ apache_conf_dir }}/conf.modules.d"
+passenger_mod_load_path: "{{ passenger_mod_configs_dir }}/10-passenger.conf"
+passenger_mod_conf_path: "{{ apache_conf_dir }}/conf.d/passenger.conf"
