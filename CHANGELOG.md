@@ -3,6 +3,10 @@ Changelog for mod_passenger role
 
 ## master
 
+## v2.0.0 (2020-04-29 15:46 MSK)
+
+* Use RPMs provided by Phusion For CentOS hosts
+
 ## v1.1.0 (2019-06-18 03:46 MSK)
 
 * Added support for Debian 9
