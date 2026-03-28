@@ -1,5 +1,5 @@
 ---
 dependencies:
   - src: geerlingguy.apache
-    version: 2.1.1
+    version: 4.2.0
     name: geerlingguy.apache
